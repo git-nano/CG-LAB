@@ -6,10 +6,20 @@ use line::{LineVec, LineRelation};
 
 use std::time::Instant;
 use indicatif::{ProgressBar, ProgressStyle};
+use std::env;
 
 fn main() {
+
+    let args: Vec<String> = env::args().collect();
+    let path: &str;
+    if args.len() == 1 {
+        path = "s_10000_1.dat";
+    } else {
+        path = &args[1];
+    }
+    let line_vec = LineVec::from_file(path);
+
     println!("The progress speed will increase over time!");
-    let line_vec = LineVec::from_file("s_10000_1.dat");
 
     let bar = ProgressBar::new(line_vec.rows as u64);
     bar.set_style(ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7}[{percent}%] {msg} Estimated: {eta}")

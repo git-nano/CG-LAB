@@ -1,4 +1,4 @@
-use crate::point::{Point,Abs};
+use crate::point::{Point,Abs,ccw};
 
 use std::fs;
 
@@ -10,9 +10,6 @@ pub enum LineRelation {
 }
 
 
-pub fn ccw(p: &Point<f64>, q: &Point<f64>, r: &Point<f64>) -> f64 {
-    return (p.x * q.y - p.y * q.x) + (q.x * r.y - q.y * r.x) + (p.y * r.x - p.x * r.y);
-}
 
 pub fn max(f1: &f64, f2: &f64) -> f64 {
     if f1 >= f2 {

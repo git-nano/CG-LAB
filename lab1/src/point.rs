@@ -8,6 +8,10 @@ pub struct Point<T> {
     pub y: T,
 }
 
+pub fn ccw(p: &Point<f64>, q: &Point<f64>, r: &Point<f64>) -> f64 {
+    return (p.x * q.y - p.y * q.x) + (q.x * r.y - q.y * r.x) + (p.y * r.x - p.x * r.y);
+}
+
 pub trait Abs {
     type Output;
     fn abs(self) -> Self::Output;

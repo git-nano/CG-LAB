@@ -58,6 +58,8 @@ impl Line {
     }
     pub fn intersect(&self, line: &Line) -> LineRelation {
         let (p1, p2, q1, q2) = (self.start, self.end, line.start, line.end);
+        //  We are doing a pivot search here in colinear overlap, if p1 and p2 are equal the ccw is zero, this however
+        //  does not mean that the two linesegments are colinear, this applies for both lines
         if ccw(&p1, &p2, &q1) == 0.0 && ccw(&p1, &p2, &q2) == 0.0 && &p1 != &p2 {
             if self.colinear_overlap(&q1)
                 || self.colinear_overlap(&q2)

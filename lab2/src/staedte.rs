@@ -31,6 +31,10 @@ impl StaedteVec{
             let mut stadt_id = String::new();
             match event {
                 Event::Tag(tag::Path, _, attributes) => {
+                    match attributes.get("d") {
+                        Some(data) => {continue;}
+                        None => {}
+                    };
                     match attributes.get("id") {
                         Some(data) => {
                             stadt_id = data.to_string();
@@ -55,11 +59,12 @@ impl StaedteVec{
                 }
                 _ => {}
             }
+            
         }
         for i in 0..x_vec.len(){
             staedte_vec.push(
                 Stadt{
-                    id: id_vec[i+16].clone(), // Start nach den Bundesländern (+16), die am Anfang stehen
+                    id: id_vec[i].clone(), // Start nach den Bundesländern (+16), die am Anfang stehen
                     location: Point{
                         x: x_vec[i],
                         y: y_vec[i],

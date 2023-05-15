@@ -26,7 +26,6 @@ impl StaedteVec{
         let mut y_vec: Vec<f64> = Vec::new();
         let mut cy: f64;
         let mut cx: f64;
-        let mut i = 0;
         for event in svg::open(path, &mut content).expect("Could not open SVG file!") {
             let mut stadt: Vec<Point<f64>> = Vec::new();
             let mut stadt_id = String::new();
@@ -36,11 +35,9 @@ impl StaedteVec{
                         Some(data) => {
                             stadt_id = data.to_string();
                             id_vec.push(stadt_id);
-                            //println!("{}", stadt_id);
                             }
                         None => {}
                     };
-                    //println!("{}", stadt_id);
                     match attributes.get("sodipodi:cx") {
                         Some(data) => {
                             cx = data.parse::<f64>().unwrap();
@@ -55,24 +52,6 @@ impl StaedteVec{
                             }
                         None => {}
                     };
-                    
-                    i = i + 1;
-                    
-                    //let p = Point {
-                    //    x: x_vec,
-                    //    y: y_vec,
-                    //};
-                    /* 
-                                    staedte_vec.push((
-                                        stadt_id.clone(),
-                                        Point {
-                                            length: poly.len().clone(),
-                                            data: poly.clone(),
-                                            closed: poly.first() == poly.last(),
-                                        },
-                                    ));
-                                    poly = Vec::new();
-                */
                 }
                 _ => {}
             }

@@ -3,6 +3,8 @@
 mod point;
 mod polygon;
 use polygon::PolygonVec;
+mod staedte;
+use staedte::StaedteVec;
 
 /*
     New version of german states: https://upload.wikimedia.org/wikipedia/commons/2/2c/Karte_Bundesrepublik_Deutschland.svg
@@ -35,6 +37,8 @@ fn main() {
             old_bundesland = bundesland.clone();
         }
     }
+    let staedte = StaedteVec::from_svg(file);
+    println!("{:?}", staedte);
 }
 
 mod test {

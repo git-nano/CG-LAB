@@ -3,7 +3,8 @@ use svg::node::element::path::{Command, Data, Position};
 use svg::node::element::tag;
 use svg::parser::Event;
 
-use crate::point::{ccw, Point};
+use crate::point::{ccw, Point, point_in_polygon};
+use crate::polygon::Polygon;
 
 #[derive(Clone, Debug)]
 pub struct Stadt {
@@ -15,6 +16,10 @@ pub struct Stadt {
 pub struct StaedteVec {
     pub length: usize,
     pub data: Vec<Stadt>,
+}
+
+pub fn stadt_in_bundesland(s: Stadt, b: Polygon) -> bool{
+    return point_in_polygon(&s.location, &b);
 }
 
 impl StaedteVec{

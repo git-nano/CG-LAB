@@ -2,6 +2,8 @@
 
 use std::ops::{Add, Div, Index, Mul, Sub};
 
+use crate::polygon::Polygon;
+
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Point<T> {
     pub x: T,
@@ -10,6 +12,20 @@ pub struct Point<T> {
 
 pub fn ccw(p: &Point<f64>, q: &Point<f64>, r: &Point<f64>) -> f64 {
     return (p.x * q.y - p.y * q.x) + (q.x * r.y - q.y * r.x) + (p.y * r.x - p.x * r.y);
+}
+
+pub fn point_in_polygon(p: &Point<f64>, poly: &Polygon) -> bool{
+    let point_outside: Point<f64> = Point { x: 0.0, y: 0.0 };
+    let mut schnitte = 0;
+    for i in 0..(poly.length - 1){
+        if ccw(&poly.data[i], &poly.data[i+1], &point_outside)*ccw(&poly.data[i], &poly.data[i+1], &p)<=0.0{
+            schnitte+=1;
+        }
+    }
+    if (schnitte % 2) == 1{
+       return true; 
+    }
+    return false;
 }
 
 pub trait Abs {

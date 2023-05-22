@@ -5,6 +5,7 @@ mod polygon;
 use polygon::PolygonVec;
 mod staedte;
 use staedte::StaedteVec;
+use crate::staedte::stadt_in_bundesland;
 
 /*
     New version of german states: https://upload.wikimedia.org/wikipedia/commons/2/2c/Karte_Bundesrepublik_Deutschland.svg
@@ -38,7 +39,14 @@ fn main() {
         }
     }
     let staedte = StaedteVec::from_svg(file);
-    println!("{:?}", staedte);
+    for i in 0..(staedte.length){
+        for j in 0..(polygon.length){
+            if stadt_in_bundesland(staedte.data[i].clone(), polygon.data[j].1.clone()){
+                println!("City {} is located in {}", staedte.data[i].id, polygon.data[j].0);
+            }
+        }
+    }
+
 }
 
 mod test {

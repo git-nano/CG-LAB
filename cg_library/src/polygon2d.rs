@@ -2,6 +2,7 @@ use crate::point2d::Point2D;
 use crate::linesegment2d::LineSegment2D;
 use crate::tools2d::ccw;
 
+#[derive(Debug, Clone)]
 pub struct Polygon2D {
 
     /// All points of the polygon
@@ -130,11 +131,19 @@ impl Polygon2D {
 
     pub fn calculate_area(&self) -> f64 {
         let mut area = 0.0;
-        for i in 0..self.points.len() {
-            let j = (i+1) % self.points.len();
-            area += ccw(&Point2D::new(), &self.points[i], &self.points[j]).abs();
+        for i in 0..( self.points.len() - 1) {
+            area += ccw(&&Point2D::new(), &self.points[i], &self.points[i + 1]);
         }
         return area * 0.5;
+    }
+
+    pub fn contains_polygon(&self, poly: &Polygon2D) -> bool {
+        for point in &poly.points {
+            if !self.contains_point(point) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
@@ -281,14 +290,25 @@ mod test_polygon {
     #[test]
     fn test_area() {
         let points = vec![
-            Point2D { x: 0.0, y: 0.0},
-            Point2D { x: 0.0, y: 2.0},
+            Point2D { x: 1.0, y: 1.0},
+            Point2D { x: 1.0, y: 2.0},
             Point2D { x: 2.0, y: 2.0},
-            Point2D { x: 2.0, y: 0.0},
+            Point2D { x: 2.0, y: 1.0},
+            Point2D { x: 1.0, y: 1.0},
         ];
 
         let poly = Polygon2D::new(points);
-        assert_eq!(4.0,poly.calculate_area());
+        assert_eq!(3.0,poly.calculate_area());
+
+        let points = vec![
+            Point2D { x: 1.0, y: 1.0},
+            Point2D { x: 1.0, y: 2.0},
+            Point2D { x: 2.0, y: 2.0},
+            Point2D { x: 2.0, y: 1.0},
+        ];
+
+        let poly = Polygon2D::new(points);
+        assert_eq!(3.0,poly.calculate_area());
     }
 
 }

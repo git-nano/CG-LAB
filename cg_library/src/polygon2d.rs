@@ -128,6 +128,15 @@ impl Polygon2D {
         crossings % 2 == 1
     }
 
+    pub fn calculate_area(&self) -> f64 {
+        let mut area = 0.0;
+        for i in 0..self.points.len() {
+            let j = (i+1) % self.points.len();
+            area += ccw(&Point2D::new(), &self.points[i], &self.points[j]).abs();
+        }
+        return area * 0.5;
+    }
+
 }
 
 
@@ -269,5 +278,17 @@ mod test_polygon {
 
     }
 
+    #[test]
+    fn test_area() {
+        let points = vec![
+            Point2D { x: 0.0, y: 0.0},
+            Point2D { x: 0.0, y: 2.0},
+            Point2D { x: 2.0, y: 2.0},
+            Point2D { x: 2.0, y: 0.0},
+        ];
+
+        let poly = Polygon2D::new(points);
+        assert_eq!(4.0,poly.calculate_area());
+    }
 
 }

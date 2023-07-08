@@ -70,6 +70,7 @@ impl fmt::Debug for EventPoint {
 #[cfg(test)]
 mod test_eventpoints {
     use super::*;
+    use std::collections::BTreeSet;
 
     #[test]
     fn test_order(){

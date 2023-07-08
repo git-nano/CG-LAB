@@ -2,7 +2,6 @@ use crate::linesegment2d::LineSegment2D;
 use crate::point2d::Point2D;
 use std::cmp::Ordering;
 use std::fmt;
-use std::collections::BTreeSet;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum EventType {

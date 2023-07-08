@@ -16,7 +16,7 @@ fn main() {
     let mut intersections: Vec<EventPoint> = Vec::new(); 
     let mut sl: SweepLine = SweepLine::new();
 
-    let segments = read_segments_from_file("s_1000_10.dat");
+    let segments = read_segments_from_file("../data/s_1000_10.dat");
     
     for segment in segments {
         if segment.line.is_vertical() {

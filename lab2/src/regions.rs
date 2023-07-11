@@ -20,7 +20,6 @@ pub struct Polygon2DArea {
 
 impl Polygon2DArea {
     pub fn contains(&self, p: &Point2D) -> bool {
-        
         for hole in &self.holes {
             if hole.contains_point(p) {
                 return false;
@@ -43,7 +42,6 @@ impl Polygon2DArea {
             area += border.calculate_area().abs();
         }
         return area;
-
     }
 }
 
@@ -81,7 +79,6 @@ pub struct Country {
     holes: Vec<Polygon2D>,
 }
 
-
 impl Country {
     pub fn from_svg(path: &str, country_name: String) -> Country {
         let mut content = String::new();
@@ -92,7 +89,6 @@ impl Country {
 
         for event in svg::open(path, &mut content).expect("Could not open SVG file!") {
             match event {
-     
                 Event::Tag(tag::SVG, _, attributes) => {
                     match attributes.get("height") {
                         Some(data) => println!("SVG height: {}", data),
@@ -105,11 +101,10 @@ impl Country {
                 }
 
                 Event::Tag(tag::Group, _, _) => {
-                    group_counter+=1;
+                    group_counter += 1;
                 }
 
                 Event::Tag(tag::Path, _, attributes) => {
-
                     match attributes.get("id") {
                         Some(data) => {
                             name = data.to_string();
@@ -119,7 +114,6 @@ impl Country {
 
                     // We are now in the state group
                     if group_counter == 1 {
-                        
                         let mut poly: Vec<Point2D> = Vec::new();
                         let mut borders: Vec<Polygon2D> = Vec::new();
 
@@ -128,10 +122,12 @@ impl Country {
                                 let parsed_data = Data::parse(data).expect("Could not parse Data!");
                                 for command in parsed_data.iter() {
                                     match command {
-                                        Command::Move(_rel_or_abs, parameters) => poly.push(Point2D {
-                                            x: parameters[0].clone() as f64,
-                                            y: parameters[1].clone() as f64,
-                                        }),
+                                        Command::Move(_rel_or_abs, parameters) => {
+                                            poly.push(Point2D {
+                                                x: parameters[0].clone() as f64,
+                                                y: parameters[1].clone() as f64,
+                                            })
+                                        }
                                         Command::Line(rel_or_abs, parameters) => match rel_or_abs {
                                             Position::Relative => poly.push(Point2D {
                                                 x: poly
@@ -162,12 +158,21 @@ impl Country {
                             }
                             None => {}
                         };
-                        states.push(State { name: name.clone(), capital: City { name: String::new(), pos: Point2D::new()}, area: Polygon2DArea { borders, holes: Vec::new() }});
+                        states.push(State {
+                            name: name.clone(),
+                            capital: City {
+                                name: String::new(),
+                                pos: Point2D::new(),
+                            },
+                            area: Polygon2DArea {
+                                borders,
+                                holes: Vec::new(),
+                            },
+                        });
                     }
 
                     // We are now in the city group
                     if group_counter == 2 {
-
                         let mut pos: Point2D = Point2D::new();
                         match attributes.get("sodipodi:cx") {
                             Some(data) => {
@@ -181,17 +186,25 @@ impl Country {
                             }
                             None => {}
                         };
-                        cities.push(City {name: name.clone(), pos});
+                        cities.push(City {
+                            name: name.clone(),
+                            pos,
+                        });
                     }
                 }
-                _ => {},
+                _ => {}
             }
         }
-        return Country {name: country_name, states, state_capitals: cities,borders: Vec::new(), holes: Vec::new()};
+        return Country {
+            name: country_name,
+            states,
+            state_capitals: cities,
+            borders: Vec::new(),
+            holes: Vec::new(),
+        };
     }
 
     pub fn fill(&mut self) {
-
         for i in 0..self.states.len() {
             for j in 0..self.states.len() {
                 if j != i {
@@ -205,7 +218,6 @@ impl Country {
                 }
             }
         }
-
     }
     pub fn print(self) {
         println!("Country: {}", self.name);
@@ -215,7 +227,10 @@ impl Country {
             println!("\t\tBorders: {}", state.area.borders.len());
             println!("\t\tHoles: {}", state.area.holes.len());
             println!("\t\tArea: {:.1}", state.area.calculate_area());
-            println!("\t\tArea in m²: {:.1}", state.area.calculate_area() * AREA_SCALER);
+            println!(
+                "\t\tArea in m²: {:.1}",
+                state.area.calculate_area() * AREA_SCALER
+            );
         }
     }
 }
@@ -226,11 +241,9 @@ mod test_city {
 
     #[test]
     fn test_from() {
-        let mut germany = Country::from_svg("./DeutschlandMitStaedten.svg", String::from("Germany"));
+        let mut germany =
+            Country::from_svg("./DeutschlandMitStaedten.svg", String::from("Germany"));
         germany.fill();
         germany.print();
     }
 }
-
-
-

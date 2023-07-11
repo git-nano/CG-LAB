@@ -1,13 +1,12 @@
-use cg_library::util::eventpoint::{EventPoint,EventType};
-use cg_library::point2d::Point2D;
 use cg_library::linesegment2d::LineSegment2D;
+use cg_library::point2d::Point2D;
+use cg_library::util::eventpoint::{EventPoint, EventType};
 
-use std::collections::{BTreeSet,LinkedList, HashMap, BTreeMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap, LinkedList};
 
-use ordered_float::OrderedFloat;
 use num_traits::Float;
+use ordered_float::OrderedFloat;
 use std::ops::Bound::{Excluded, Unbounded};
-
 
 pub struct SweepLine {
     pub event_queue: BTreeSet<EventPoint>,
@@ -20,7 +19,14 @@ pub struct SweepLine {
 
 impl SweepLine {
     pub fn new() -> SweepLine {
-        return SweepLine { event_queue: BTreeSet::new(),segments: BTreeMap::new(), current_event: None,events_order: OrderedFloat(0.0), current_x: 0.0, intersection_points: Vec::new()};
+        return SweepLine {
+            event_queue: BTreeSet::new(),
+            segments: BTreeMap::new(),
+            current_event: None,
+            events_order: OrderedFloat(0.0),
+            current_x: 0.0,
+            intersection_points: Vec::new(),
+        };
     }
     pub fn process_next_event(&mut self) {
         let e: EventPoint = self.event_queue.pop_first().unwrap();
@@ -37,10 +43,9 @@ impl SweepLine {
                 let seg_a = self.get_next_neighbor(self.events_order);
                 let seg_b = self.get_prev_neighbor(self.events_order);
 
-
                 if let Some(seg_a) = seg_a {
                     if let Some(intersection) = seg_a.intersects(&seg_e) {
-                        if intersection.x > self.current_x{
+                        if intersection.x > self.current_x {
                             self.event_queue.insert(EventPoint {
                                 point: intersection.round(9),
                                 event_type: EventType::IsIntersection,
@@ -53,7 +58,7 @@ impl SweepLine {
 
                 if let Some(seg_b) = seg_b {
                     if let Some(intersection) = seg_b.intersects(&seg_e) {
-                        if intersection.x > self.current_x{
+                        if intersection.x > self.current_x {
                             self.event_queue.insert(EventPoint {
                                 point: intersection.round(9),
                                 event_type: EventType::IsIntersection,
@@ -72,7 +77,7 @@ impl SweepLine {
 
                 if let (Some(seg_a), Some(seg_b)) = (seg_a, seg_b) {
                     if let Some(intersection) = seg_a.intersects(&seg_b) {
-                        if intersection.x > self.current_x{
+                        if intersection.x > self.current_x {
                             self.event_queue.insert(EventPoint {
                                 point: intersection.round(9),
                                 event_type: EventType::IsIntersection,
@@ -89,17 +94,16 @@ impl SweepLine {
                 let mut seg_e1 = e.first_line;
                 let mut seg_e2 = e.second_line.unwrap();
                 if seg_e2 > seg_e1 {
-                   (seg_e1, seg_e2) = (seg_e2, seg_e1);
+                    (seg_e1, seg_e2) = (seg_e2, seg_e1);
                 } // seg_e1 is now above seg_e2
                 let order_e1 = OrderedFloat(seg_e1.line.y_from_x(self.current_x + 1e-8));
                 let order_e2 = OrderedFloat(seg_e2.line.y_from_x(self.current_x + 1e-8));
                 let seg_a = self.get_prev_neighbor(order_e2);
                 let seg_b = self.get_next_neighbor(order_e1);
- 
 
                 if let Some(seg_a) = seg_a {
                     if let Some(intersection) = seg_a.intersects(&seg_e2) {
-                        if intersection.x > self.current_x{
+                        if intersection.x > self.current_x {
                             self.event_queue.insert(EventPoint {
                                 point: intersection.round(9),
                                 event_type: EventType::IsIntersection,
@@ -112,7 +116,7 @@ impl SweepLine {
 
                 if let Some(seg_b) = seg_b {
                     if let Some(intersection) = seg_b.intersects(&seg_e1) {
-                        if intersection.x > self.current_x{
+                        if intersection.x > self.current_x {
                             self.event_queue.insert(EventPoint {
                                 point: intersection.round(9),
                                 event_type: EventType::IsIntersection,
@@ -122,18 +126,19 @@ impl SweepLine {
                         }
                     }
                 }
-
-                
             }
         }
-
     }
 
     pub fn update_segments(&mut self) {
-        let epsilon = if self.current_event.unwrap().event_type != EventType::IsIntersection {0.0} else {1e-8};
+        let epsilon = if self.current_event.unwrap().event_type != EventType::IsIntersection {
+            0.0
+        } else {
+            1e-8
+        };
 
         let mut temp_map: BTreeMap<OrderedFloat<f64>, LineSegment2D> = BTreeMap::new();
-        
+
         for (&key, &value) in &self.segments {
             let updated_key = OrderedFloat(value.line.y_from_x(self.current_x + epsilon));
             temp_map.insert(updated_key, value);
@@ -146,10 +151,9 @@ impl SweepLine {
         println!("\nCurrent x: {}", self.current_x);
         println!("Current event: {}", self.current_event.unwrap());
         println!("Current key: {}", self.events_order);
-        for (key,value) in &self.segments {
-            println!("( key: {} , slope: {} )",key, value.line.slope);
+        for (key, value) in &self.segments {
+            println!("( key: {} , slope: {} )", key, value.line.slope);
         }
-
     }
 
     pub fn get_next_neighbor(&self, key: OrderedFloat<f64>) -> Option<LineSegment2D> {
@@ -168,5 +172,4 @@ impl SweepLine {
             return None;
         }
     }
-
 }

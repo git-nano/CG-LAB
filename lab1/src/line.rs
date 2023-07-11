@@ -1,4 +1,4 @@
-use crate::point::{Point,Abs,ccw};
+use crate::point::{ccw, Abs, Point};
 
 use std::fs;
 
@@ -8,8 +8,6 @@ pub enum LineRelation {
     ColinearOverlap,
     ColinearNonOverlap,
 }
-
-
 
 pub fn max(f1: &f64, f2: &f64) -> f64 {
     if f1 >= f2 {
@@ -129,4 +127,3 @@ impl LineVec {
         };
     }
 }
-

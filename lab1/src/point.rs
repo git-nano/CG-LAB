@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::ops::{Add,Sub,Mul,Div,Index};
+use std::ops::{Add, Div, Index, Mul, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Point<T> {
@@ -27,8 +27,10 @@ impl Abs for Point<f64> {
     }
 }
 
-impl <T>Add for Point<T> 
-where T: Add<Output = T>{
+impl<T> Add for Point<T>
+where
+    T: Add<Output = T>,
+{
     type Output = Self;
     fn add(self, other: Self) -> Self::Output {
         Self {
@@ -38,8 +40,10 @@ where T: Add<Output = T>{
     }
 }
 
-impl <T>Sub for Point<T> 
-where T: Sub<Output = T>{
+impl<T> Sub for Point<T>
+where
+    T: Sub<Output = T>,
+{
     type Output = Self;
     fn sub(self, other: Self) -> Self::Output {
         Self {
@@ -49,8 +53,10 @@ where T: Sub<Output = T>{
     }
 }
 
-impl <T>Mul for Point<T> 
-where T: Mul<Output = T>{
+impl<T> Mul for Point<T>
+where
+    T: Mul<Output = T>,
+{
     type Output = Self;
     fn mul(self, other: Self) -> Self::Output {
         Self {
@@ -60,8 +66,10 @@ where T: Mul<Output = T>{
     }
 }
 
-impl <T>Div for Point<T> 
-where T: Div<Output = T>{
+impl<T> Div for Point<T>
+where
+    T: Div<Output = T>,
+{
     type Output = Self;
     fn div(self, other: Self) -> Self::Output {
         Self {
@@ -71,7 +79,7 @@ where T: Div<Output = T>{
     }
 }
 
-impl <T>Index<usize> for Point<T> {
+impl<T> Index<usize> for Point<T> {
     type Output = T;
     fn index(&self, i: usize) -> &Self::Output {
         match i {
@@ -82,8 +90,10 @@ impl <T>Index<usize> for Point<T> {
     }
 }
 
-impl<T> Point<T> 
-where T: PartialOrd {
+impl<T> Point<T>
+where
+    T: PartialOrd,
+{
     pub fn index_of_significance(&self) -> usize {
         if self.x > self.y {
             return 0;
@@ -91,4 +101,3 @@ where T: PartialOrd {
         return 1;
     }
 }
-

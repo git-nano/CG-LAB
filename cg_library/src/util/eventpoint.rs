@@ -10,7 +10,6 @@ pub enum EventType {
     IsIntersection,
 }
 
-
 impl fmt::Display for EventType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -49,10 +48,13 @@ impl PartialEq for EventPoint {
     }
 }
 
-
 impl fmt::Display for EventPoint {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,"e: {}, p: {}, s: {}", self.event_type, self.point, self.first_line)
+        write!(
+            f,
+            "e: {}, p: {}, s: {}",
+            self.event_type, self.point, self.first_line
+        )
     }
 }
 
@@ -73,36 +75,70 @@ mod test_eventpoints {
     use std::collections::BTreeSet;
 
     #[test]
-    fn test_order(){
+    fn test_order() {
         let p1: Point2D = Point2D { x: 0.0, y: 0.0 };
         let p2: Point2D = Point2D { x: 1.0, y: 1.0 };
         let s1: LineSegment2D = LineSegment2D::new(p1, p2);
-        let e1:EventPoint = EventPoint { point: s1.p1, event_type: EventType::IsLeftEndpoint, first_line: s1, second_line: None };
-        let e2:EventPoint = EventPoint { point: s1.p2, event_type: EventType::IsRightEndpoint, first_line: s1, second_line: None };
+        let e1: EventPoint = EventPoint {
+            point: s1.p1,
+            event_type: EventType::IsLeftEndpoint,
+            first_line: s1,
+            second_line: None,
+        };
+        let e2: EventPoint = EventPoint {
+            point: s1.p2,
+            event_type: EventType::IsRightEndpoint,
+            first_line: s1,
+            second_line: None,
+        };
         assert_eq!(true, e2 > e1);
     }
 
     #[test]
     fn test_btree() {
-        
         let mut queue: BTreeSet<EventPoint> = BTreeSet::new();
 
         let p1: Point2D = Point2D { x: 0.0, y: 2.0 };
         let p2: Point2D = Point2D { x: 2.0, y: 0.0 };
         let s1: LineSegment2D = LineSegment2D::new(p1, p2);
-        let e1_1:EventPoint = EventPoint { point: s1.p1, event_type: EventType::IsLeftEndpoint, first_line: s1, second_line: None };
-        let e1_2:EventPoint = EventPoint { point: s1.p2, event_type: EventType::IsRightEndpoint, first_line: s1, second_line: None };
+        let e1_1: EventPoint = EventPoint {
+            point: s1.p1,
+            event_type: EventType::IsLeftEndpoint,
+            first_line: s1,
+            second_line: None,
+        };
+        let e1_2: EventPoint = EventPoint {
+            point: s1.p2,
+            event_type: EventType::IsRightEndpoint,
+            first_line: s1,
+            second_line: None,
+        };
 
         let p1: Point2D = Point2D { x: 0.0, y: 0.0 };
         let p2: Point2D = Point2D { x: 2.0, y: 2.0 };
         let s2: LineSegment2D = LineSegment2D::new(p1, p2);
-        let e2_1:EventPoint = EventPoint { point: s2.p1, event_type: EventType::IsLeftEndpoint, first_line: s2, second_line: None };
-        let e2_2:EventPoint = EventPoint { point: s2.p2, event_type: EventType::IsRightEndpoint, first_line: s2, second_line: None };
+        let e2_1: EventPoint = EventPoint {
+            point: s2.p1,
+            event_type: EventType::IsLeftEndpoint,
+            first_line: s2,
+            second_line: None,
+        };
+        let e2_2: EventPoint = EventPoint {
+            point: s2.p2,
+            event_type: EventType::IsRightEndpoint,
+            first_line: s2,
+            second_line: None,
+        };
 
         let p1: Point2D = Point2D { x: 1.0, y: 1.0 };
-        let e12:EventPoint = EventPoint { point: p1, event_type: EventType::IsIntersection, first_line: s1, second_line: Some(s2) };
+        let e12: EventPoint = EventPoint {
+            point: p1,
+            event_type: EventType::IsIntersection,
+            first_line: s1,
+            second_line: Some(s2),
+        };
 
-        queue.extend(vec![e1_1,e1_2,e2_1,e2_2, e12]);
+        queue.extend(vec![e1_1, e1_2, e2_1, e2_2, e12]);
         let mut i = queue.into_iter();
         assert_eq!(EventType::IsLeftEndpoint, i.next().unwrap().event_type);
         assert_eq!(EventType::IsLeftEndpoint, i.next().unwrap().event_type);
@@ -110,10 +146,4 @@ mod test_eventpoints {
         assert_eq!(EventType::IsRightEndpoint, i.next().unwrap().event_type);
         assert_eq!(EventType::IsRightEndpoint, i.next().unwrap().event_type);
     }
-
-    
-
-
-
 }
-

@@ -1,31 +1,29 @@
 #![allow(dead_code)]
 
-use std::cmp::Ordering;
-use crate::point2d::Point2D;
 use crate::line2d::Line2D;
+use crate::point2d::Point2D;
 use crate::tools2d::ccw;
+use std::cmp::Ordering;
 use std::fmt;
 
-
-#[derive(Debug,PartialEq, PartialOrd, Clone, Copy)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 /// This is a struct representing a line segment
 pub struct LineSegment2D {
-    
     /// The line that runs through this Segment
     pub line: Line2D,
-    
+
     /// The point that has the smallest x value, or if equal, the smallest y value
     pub p1: Point2D,
-    
+
     /// The point that has the highest x value, or if equal, the highest y value
     pub p2: Point2D,
 
     /// Maximum x value of the bounding box of the Segment
     pub max_x: f64,
-    
+
     /// Maximum y value of the bounding box of the Segment
     pub max_y: f64,
-    
+
     /// Minimum x value of the bounding box of the Segment
     pub min_x: f64,
 
@@ -63,21 +61,29 @@ impl LineSegment2D {
         }
     }
 
-    pub fn length_xy (self) -> f64 {
+    pub fn length_xy(self) -> f64 {
         self.p1.distance_to(&self.p2)
     }
-    pub fn has_endpoint (self, p: &Point2D) -> bool {
+    pub fn has_endpoint(self, p: &Point2D) -> bool {
         self.p1 == *p || self.p2 == *p
     }
 
     pub fn center(self) -> Point2D {
         let dx = (self.p1.x - self.p2.x).abs();
         let dy = (self.p1.y - self.p2.y).abs();
-        Point2D { x: self.p1.x + dx/2.0, y: self.p1.y + dy/2.0}
+        Point2D {
+            x: self.p1.x + dx / 2.0,
+            y: self.p1.y + dy / 2.0,
+        }
     }
 
     pub fn contains(self, p: &Point2D) -> bool {
-        self.has_endpoint(p) || (self.line.contains(p) && (p.x >= self.min_x && p.x <= self.max_x && p.y >= self.min_y && p.y <= self.max_y))
+        self.has_endpoint(p)
+            || (self.line.contains(p)
+                && (p.x >= self.min_x
+                    && p.x <= self.max_x
+                    && p.y >= self.min_y
+                    && p.y <= self.max_y))
     }
 
     /// This calculates all real intersections, so two line Segments share exactly one point. If
@@ -107,23 +113,25 @@ impl LineSegment2D {
     }
 
     pub fn geogebra(self) {
-        println!("Segment(({},{}),({},{}))",self.p1.x,self.p1.y, self.p2.x,self.p2.y);
+        println!(
+            "Segment(({},{}),({},{}))",
+            self.p1.x, self.p1.y, self.p2.x, self.p2.y
+        );
     }
 }
 
 impl fmt::Display for LineSegment2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,"p1: {}, p2: {}", self.p1, self.p2)
+        write!(f, "p1: {}, p2: {}", self.p1, self.p2)
     }
 }
-
 
 #[cfg(test)]
 mod test_linesegemnt2d {
     use super::*;
 
     #[test]
-    fn test_new(){
+    fn test_new() {
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 0.0, y: 1.0 });
         let s2 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 1.0, y: 0.0 });
         let s3 = LineSegment2D::new(Point2D { x: 1.0, y: 0.0 }, Point2D { x: 0.0, y: 0.0 });
@@ -136,7 +144,7 @@ mod test_linesegemnt2d {
 
     #[test]
     #[should_panic]
-    fn test_new_fail(){
+    fn test_new_fail() {
         let _s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 0.0, y: 0.0 });
     }
 
@@ -160,59 +168,55 @@ mod test_linesegemnt2d {
     }
 
     #[test]
-    fn test_center () {
+    fn test_center() {
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
-        assert_eq!(Point2D{ x: 1.0, y: 1.0}, s1.center());
+        assert_eq!(Point2D { x: 1.0, y: 1.0 }, s1.center());
     }
 
     #[test]
-    fn test_contains () {
+    fn test_contains() {
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
-        let p1 = Point2D{ x: 1.0, y: 1.0};
-        let p2 = Point2D{ x: 2.0, y: 1.0};
+        let p1 = Point2D { x: 1.0, y: 1.0 };
+        let p2 = Point2D { x: 2.0, y: 1.0 };
         assert_eq!(true, s1.contains(&p1));
         assert_eq!(false, s1.contains(&p2));
-        
     }
 
     #[test]
     fn test_intersections() {
-
         // s1 and s2 are colinear and they share one endpoint (2,2)
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
         let s2 = LineSegment2D::new(Point2D { x: 3.0, y: 3.0 }, Point2D { x: 2.0, y: 2.0 });
-        assert_eq!(Some(Point2D { x: 2.0, y: 2.0 }),s1.intersects(&s2));
+        assert_eq!(Some(Point2D { x: 2.0, y: 2.0 }), s1.intersects(&s2));
 
         // s1 and s2 share one endpoint (0,0)
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
         let s2 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: -2.0 });
-        assert_eq!(Some(Point2D { x: 0.0, y: 0.0 }),s1.intersects(&s2));
-        
-        // s1 and s2 are colinear and don't overlap 
+        assert_eq!(Some(Point2D { x: 0.0, y: 0.0 }), s1.intersects(&s2));
+
+        // s1 and s2 are colinear and don't overlap
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
         let s2 = LineSegment2D::new(Point2D { x: 3.0, y: 3.0 }, Point2D { x: 2.5, y: 2.5 });
-        assert_eq!(None,s1.intersects(&s2));
+        assert_eq!(None, s1.intersects(&s2));
 
         // s1 and s2 are colinear and overlap
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
         let s2 = LineSegment2D::new(Point2D { x: 3.0, y: 3.0 }, Point2D { x: 1.5, y: 1.5 });
-        assert_eq!(None,s1.intersects(&s2));
-        
+        assert_eq!(None, s1.intersects(&s2));
+
         // s1 and s2 share no point
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
         let s2 = LineSegment2D::new(Point2D { x: -2.0, y: 1.0 }, Point2D { x: 1.0, y: -2.0 });
-        assert_eq!(None,s1.intersects(&s2));
+        assert_eq!(None, s1.intersects(&s2));
 
         // s1 and s2 share one point at (1,1)
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
         let s2 = LineSegment2D::new(Point2D { x: 0.0, y: 2.0 }, Point2D { x: 2.0, y: 0.0 });
-        assert_eq!(Some(Point2D { x: 1.0, y: 1.0 }),s1.intersects(&s2));
+        assert_eq!(Some(Point2D { x: 1.0, y: 1.0 }), s1.intersects(&s2));
 
         // s1 and s2 are equal
         let s1 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
         let s2 = LineSegment2D::new(Point2D { x: 0.0, y: 0.0 }, Point2D { x: 2.0, y: 2.0 });
-        assert_eq!(None,s1.intersects(&s2));
+        assert_eq!(None, s1.intersects(&s2));
     }
-
-
 }

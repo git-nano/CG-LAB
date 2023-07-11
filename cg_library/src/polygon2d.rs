@@ -1,38 +1,36 @@
-use crate::point2d::Point2D;
 use crate::linesegment2d::LineSegment2D;
+use crate::point2d::Point2D;
 use crate::tools2d::ccw;
 
 #[derive(Debug, Clone)]
 pub struct Polygon2D {
-
     /// All points of the polygon
     pub points: Vec<Point2D>,
 
     /// All segments of the polygon
     segments: Vec<LineSegment2D>,
-    
+
     /// Whether the polygon is a simple one
     simple: bool,
-    
+
     /// Whether the polygon is a convex one
     convex: bool,
 
     /// Maximum x value of the bounding box of the Segment
     max_x: f64,
-    
+
     /// Maximum y value of the bounding box of the Segment
     max_y: f64,
-    
+
     /// Minimum x value of the bounding box of the Segment
     min_x: f64,
 
     /// Minimum y value of the bounding box of the Segment
     min_y: f64,
-    
 }
 
 impl Polygon2D {
-    pub fn new( points: Vec<Point2D> ) -> Polygon2D {
+    pub fn new(points: Vec<Point2D>) -> Polygon2D {
         if points.len() <= 2 {
             panic!("A polygon consisting of two points is no polygon!");
         }
@@ -52,10 +50,18 @@ impl Polygon2D {
             max_x = max_x.max(point.x);
             min_y = min_y.min(point.y);
             max_y = max_y.max(point.y);
-
         }
 
-        return Polygon2D { points, segments, simple: false, convex: false, max_x, max_y, min_x, min_y };
+        return Polygon2D {
+            points,
+            segments,
+            simple: false,
+            convex: false,
+            max_x,
+            max_y,
+            min_x,
+            min_y,
+        };
     }
 
     pub fn print(&self) {
@@ -67,19 +73,20 @@ impl Polygon2D {
         for i in &self.segments {
             println!("{}", i);
         }
-
     }
 
     /// This actually does not work for points on the polygon
     pub fn contains(&self, q: &Point2D) -> bool {
-        
         // Get a point outside of the polygon
-        let p_outside: Point2D = Point2D { x: self.max_x + 1.0, y: self.max_y + 1.0 };
+        let p_outside: Point2D = Point2D {
+            x: self.max_x + 1.0,
+            y: self.max_y + 1.0,
+        };
 
-        // Retrieve polygon point that is not part of the segment p_outside q 
+        // Retrieve polygon point that is not part of the segment p_outside q
         let mut i = 0;
         while 0.0 == ccw(&p_outside, &q, &self.points[i]) {
-            i+=1;
+            i += 1;
         }
         // println!("point not between p_outside and q: {}",self.points[i]);
         // println!("p_outside: {}", p_outside);
@@ -97,7 +104,7 @@ impl Polygon2D {
                     * ccw(&self.points[j - 1], &self.points[j], &q)
                     <= 0.0
                 {
-                    s+=1;
+                    s += 1;
                     // println!("Adding one: s = {}",s);
                     // println!("\np[j-1]: {} and p[j]: {} means p~: {} and q: {} lie on opposite sides",&self.points[j-1], &self.points[g], p_outside, q);
                 }
@@ -117,9 +124,10 @@ impl Polygon2D {
             if (self.points[i].y <= p.y && p.y < self.points[j].y)
                 || (self.points[j].y <= p.y && p.y < self.points[i].y)
             {
-                if p.x < (self.points[j].x - self.points[i].x) * (p.y - self.points[i].y)
-                    / (self.points[j].y - self.points[i].y)
-                    + self.points[i].x
+                if p.x
+                    < (self.points[j].x - self.points[i].x) * (p.y - self.points[i].y)
+                        / (self.points[j].y - self.points[i].y)
+                        + self.points[i].x
                 {
                     crossings += 1;
                 }
@@ -131,7 +139,7 @@ impl Polygon2D {
 
     pub fn calculate_area(&self) -> f64 {
         let mut area = 0.0;
-        for i in 0..( self.points.len() - 1) {
+        for i in 0..(self.points.len() - 1) {
             area += ccw(&&Point2D::new(), &self.points[i], &self.points[i + 1]);
         }
         return area * 0.5;
@@ -145,9 +153,7 @@ impl Polygon2D {
         }
         return true;
     }
-
 }
-
 
 #[cfg(test)]
 mod test_polygon {
@@ -156,11 +162,11 @@ mod test_polygon {
     #[test]
     fn test_new() {
         let points = vec![
-            Point2D { x: 0.0, y: 0.0},
-            Point2D { x: 1.0, y: 1.0},
-            Point2D { x: 1.0, y: 2.0},
-            Point2D { x: 2.0, y: 2.0},
-            Point2D { x: 3.0, y: 3.0},
+            Point2D { x: 0.0, y: 0.0 },
+            Point2D { x: 1.0, y: 1.0 },
+            Point2D { x: 1.0, y: 2.0 },
+            Point2D { x: 2.0, y: 2.0 },
+            Point2D { x: 3.0, y: 3.0 },
         ];
 
         let _ = Polygon2D::new(points);
@@ -170,28 +176,25 @@ mod test_polygon {
     #[test]
     #[should_panic]
     fn test_panic() {
-        let points = vec![
-            Point2D { x: 0.0, y: 0.0},
-            Point2D { x: 1.0, y: 1.0},
-        ];
+        let points = vec![Point2D { x: 0.0, y: 0.0 }, Point2D { x: 1.0, y: 1.0 }];
         let _ = Polygon2D::new(points);
     }
 
     #[test]
     fn test_inside() {
         let points = vec![
-            Point2D { x: 0.0, y: 0.0},
-            Point2D { x: 1.0, y: 1.0},
-            Point2D { x: 1.0, y: 2.0},
-            Point2D { x: 2.0, y: 2.0},
-            Point2D { x: 3.0, y: 3.0},
-            Point2D { x: 3.0, y: 0.0},
+            Point2D { x: 0.0, y: 0.0 },
+            Point2D { x: 1.0, y: 1.0 },
+            Point2D { x: 1.0, y: 2.0 },
+            Point2D { x: 2.0, y: 2.0 },
+            Point2D { x: 3.0, y: 3.0 },
+            Point2D { x: 3.0, y: 0.0 },
         ];
-        let poly:Polygon2D = Polygon2D::new(points);
+        let poly: Polygon2D = Polygon2D::new(points);
 
         // This point is a point on the polygon
         let p1: Point2D = Point2D { x: 1.0, y: 1.0 };
-        assert_eq!(true,poly.contains(&p1));
+        assert_eq!(true, poly.contains(&p1));
 
         // This point is a point on the polygon line
         let p1: Point2D = Point2D { x: 2.0, y: 1.0 };
@@ -212,7 +215,7 @@ mod test_polygon {
         // This point is a point on the polygon line
         let p1: Point2D = Point2D { x: 0.5, y: 0.5 };
         assert_eq!(true, poly.contains(&p1));
-            
+
         // poly.print();
 
         // 3 - # - # - # - o
@@ -220,17 +223,16 @@ mod test_polygon {
         // 1 - # - o - # - #
         // 0 - o - # - # - #
         //     0 - 1 - 2 - 3
-
     }
 
     #[test]
     fn test_should_work() {
         let points = vec![
-            Point2D { x: 1.0, y: 1.0},
-            Point2D { x: 1.0, y: 2.0},
-            Point2D { x: 2.0, y: 2.0},
+            Point2D { x: 1.0, y: 1.0 },
+            Point2D { x: 1.0, y: 2.0 },
+            Point2D { x: 2.0, y: 2.0 },
         ];
-        let poly:Polygon2D = Polygon2D::new(points);
+        let poly: Polygon2D = Polygon2D::new(points);
 
         // This point is a point on the polygon line
         let p1: Point2D = Point2D { x: 1.0, y: 1.5 };
@@ -238,22 +240,21 @@ mod test_polygon {
         assert_ne!(true, poly.contains(&p1));
     }
 
-
     #[test]
     fn test_contains_point() {
         let points = vec![
-            Point2D { x: 0.0, y: 0.0},
-            Point2D { x: 1.0, y: 1.0},
-            Point2D { x: 1.0, y: 2.0},
-            Point2D { x: 2.0, y: 2.0},
-            Point2D { x: 3.0, y: 3.0},
-            Point2D { x: 3.0, y: 0.0},
+            Point2D { x: 0.0, y: 0.0 },
+            Point2D { x: 1.0, y: 1.0 },
+            Point2D { x: 1.0, y: 2.0 },
+            Point2D { x: 2.0, y: 2.0 },
+            Point2D { x: 3.0, y: 3.0 },
+            Point2D { x: 3.0, y: 0.0 },
         ];
-        let poly:Polygon2D = Polygon2D::new(points);
+        let poly: Polygon2D = Polygon2D::new(points);
 
         // This point is a point on the polygon
         let p1: Point2D = Point2D { x: 1.0, y: 1.0 };
-        assert_eq!(true,poly.contains_point(&p1));
+        assert_eq!(true, poly.contains_point(&p1));
 
         // This point is a point on the polygon line
         let p1: Point2D = Point2D { x: 2.0, y: 1.0 };
@@ -274,7 +275,7 @@ mod test_polygon {
         // This point is a point on the polygon line
         let p1: Point2D = Point2D { x: 0.5, y: 0.5 };
         assert_eq!(true, poly.contains_point(&p1));
-            
+
         // This point is a point on the polygon line
         let p1: Point2D = Point2D { x: 1.0, y: 1.5 };
         assert_eq!(true, poly.contains_point(&p1));
@@ -284,31 +285,29 @@ mod test_polygon {
         // 1 - # - o - # - #
         // 0 - o - # - # - #
         //     0 - 1 - 2 - 3
-
     }
 
     #[test]
     fn test_area() {
         let points = vec![
-            Point2D { x: 1.0, y: 1.0},
-            Point2D { x: 1.0, y: 2.0},
-            Point2D { x: 2.0, y: 2.0},
-            Point2D { x: 2.0, y: 1.0},
-            Point2D { x: 1.0, y: 1.0},
+            Point2D { x: 1.0, y: 1.0 },
+            Point2D { x: 1.0, y: 2.0 },
+            Point2D { x: 2.0, y: 2.0 },
+            Point2D { x: 2.0, y: 1.0 },
+            Point2D { x: 1.0, y: 1.0 },
         ];
 
         let poly = Polygon2D::new(points);
-        assert_eq!(3.0,poly.calculate_area());
+        assert_eq!(3.0, poly.calculate_area());
 
         let points = vec![
-            Point2D { x: 1.0, y: 1.0},
-            Point2D { x: 1.0, y: 2.0},
-            Point2D { x: 2.0, y: 2.0},
-            Point2D { x: 2.0, y: 1.0},
+            Point2D { x: 1.0, y: 1.0 },
+            Point2D { x: 1.0, y: 2.0 },
+            Point2D { x: 2.0, y: 2.0 },
+            Point2D { x: 2.0, y: 1.0 },
         ];
 
         let poly = Polygon2D::new(points);
-        assert_eq!(3.0,poly.calculate_area());
+        assert_eq!(3.0, poly.calculate_area());
     }
-
 }

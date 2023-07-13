@@ -30,9 +30,12 @@ pub struct Polygon2D {
 }
 
 impl Polygon2D {
-    pub fn new(points: Vec<Point2D>) -> Polygon2D {
+    pub fn new(mut points: Vec<Point2D>) -> Polygon2D {
         if points.len() <= 2 {
             panic!("A polygon consisting of two points is no polygon!");
+        } else if points.first() != points.last() {
+            println!("The first point does not match the last point!\nIt gets appended now!");
+            points.push(*points.first().unwrap());
         }
 
         let mut segments: Vec<LineSegment2D> = Vec::new();
@@ -298,7 +301,7 @@ mod test_polygon {
         ];
 
         let poly = Polygon2D::new(points);
-        assert_eq!(3.0, poly.calculate_area());
+        assert_eq!(-1.0, poly.calculate_area());
 
         let points = vec![
             Point2D { x: 1.0, y: 1.0 },
@@ -308,6 +311,6 @@ mod test_polygon {
         ];
 
         let poly = Polygon2D::new(points);
-        assert_eq!(3.0, poly.calculate_area());
+        assert_eq!(-1.0, poly.calculate_area());
     }
 }

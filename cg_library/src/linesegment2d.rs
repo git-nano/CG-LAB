@@ -1,4 +1,6 @@
-#![allow(dead_code)]
+//! LineSegment in a 2-Dimensional vector space.
+//!
+//! Provides a linesegment struct for the computational geometry library [cg_library](crate).
 
 use crate::line2d::Line2D;
 use crate::point2d::Point2D;
@@ -7,31 +9,48 @@ use std::cmp::Ordering;
 use std::fmt;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
-/// This is a struct representing a line segment
+/// A line segment in a 2D vector space.
+///
+/// A line segment consists of two points, that are the endpoints of the segment. It is used in
+/// combination with the bently_ottmann algorithm as well as a
+/// [Polygon2D](crate::polygon2d::Polygon2D).
+///
+/// # Example
+///
+/// ```
+/// use cg_library::linesegment2d::LineSegment2D;
+/// use cg_library::point2d::Point2D;
+/// let p1: Point2D = Point2D::new();
+/// let p2: Point2D = Point2D{x: 1.0, y: 1.0};
+/// let ls: LineSegment2D = LineSegment2D::new(p1, p2);
+/// ```
 pub struct LineSegment2D {
     /// The line that runs through this Segment
     pub line: Line2D,
 
-    /// The point that has the smallest x value, or if equal, the smallest y value
+    /// The [point](crate::point2d::Point2D) that has the smallest x-coordinate, or if equal, the smallest y-coordinate
     pub p1: Point2D,
 
-    /// The point that has the highest x value, or if equal, the highest y value
+    /// The [point](crate::point2d::Point2D) that has the highest x-coordinate, or if equal, the highest y-coordinate
     pub p2: Point2D,
 
-    /// Maximum x value of the bounding box of the Segment
+    /// Maximum x-coordinate of the bounding box of the segment
     pub max_x: f64,
 
-    /// Maximum y value of the bounding box of the Segment
+    /// Maximum y-coordinate of the bounding box of the segment
     pub max_y: f64,
 
-    /// Minimum x value of the bounding box of the Segment
+    /// Minimum x-coordinate of the bounding box of the segment
     pub min_x: f64,
 
-    /// Minimum y value of the bounding box of the Segment
+    /// Minimum y-coordinate of the bounding box of the segment
     pub min_y: f64,
 }
 
+/// This trait needs to be implemented to satisfy PartialOrd, it is not yet used.
 impl Eq for LineSegment2D {}
+
+/// This trait is implemented to satisfy PartialOrd, and sorts line segments by its starting point.
 impl Ord for LineSegment2D {
     fn cmp(&self, other: &LineSegment2D) -> Ordering {
         self.p1.partial_cmp(&other.p1).unwrap()
@@ -39,6 +58,10 @@ impl Ord for LineSegment2D {
 }
 
 impl LineSegment2D {
+    /// Returns a new instance given two points.
+    ///
+    /// # Panics
+    /// This function is not allowed to be given two points that are equal.
     pub fn new(p_a: Point2D, p_b: Point2D) -> LineSegment2D {
         if p_a == p_b {
             panic!("A segment with two Points at the same position is not allowed!");
@@ -61,13 +84,17 @@ impl LineSegment2D {
         }
     }
 
+    /// Returns the euclidean distance from start to endpoint.
     pub fn length_xy(self) -> f64 {
         self.p1.distance_to(&self.p2)
     }
+
+    /// Returns `true` iff the point of the argument is among the segment endpoints.
     pub fn has_endpoint(self, p: &Point2D) -> bool {
         self.p1 == *p || self.p2 == *p
     }
 
+    /// Returns the center point of the line segment.
     pub fn center(self) -> Point2D {
         let dx = (self.p1.x - self.p2.x).abs();
         let dy = (self.p1.y - self.p2.y).abs();
@@ -77,6 +104,7 @@ impl LineSegment2D {
         }
     }
 
+    /// Returns `true` iff a point is element of the segment.
     pub fn contains(self, p: &Point2D) -> bool {
         self.has_endpoint(p)
             || (self.line.contains(p)
@@ -86,8 +114,11 @@ impl LineSegment2D {
                     && p.y <= self.max_y))
     }
 
-    /// This calculates all real intersections, so two line Segments share exactly one point. If
-    /// colinear they share one endpoint. They are not intersecting if they share multiple points.
+    /// Calculate the intersection point with another line segment.
+    ///
+    /// This returns an intersection point to another line segment if exists. If not `None` is
+    /// returned. This function uses the counter clock wise ([ccw](crate::tools2d::ccw)) implementation.
+    /// If the lines overlap colinear, also `None` is returned.
     pub fn intersects(self, other: &LineSegment2D) -> Option<Point2D> {
         let (p1, p2, q1, q2) = (self.p1, self.p2, other.p1, other.p2);
 
@@ -112,6 +143,7 @@ impl LineSegment2D {
         None
     }
 
+    /// This prints a geogebra style object that can be copied into the [geogebra calculator](https://www.geogebra.org/calculator).
     pub fn geogebra(self) {
         println!(
             "Segment(({},{}),({},{}))",
@@ -120,6 +152,7 @@ impl LineSegment2D {
     }
 }
 
+/// This trait allows a line segment to be displayed in the form of `p1: (x1,y1), p2: (x2,y2)`.
 impl fmt::Display for LineSegment2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "p1: {}, p2: {}", self.p1, self.p2)
@@ -151,7 +184,7 @@ mod test_linesegemnt2d {
     #[test]
     fn test_line() {
         let s1 = LineSegment2D::new(Point2D { x: 1.0, y: 0.0 }, Point2D { x: 1.0, y: 1.0 });
-        assert_eq!("x = +1", s1.line.to_string());
+        assert_eq!("f(y) -> +1", s1.line.to_string());
     }
 
     #[test]

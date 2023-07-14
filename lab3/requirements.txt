@@ -1,0 +1,4 @@
+line-segment-intersections
+numpy
+sympy
+matplotlib

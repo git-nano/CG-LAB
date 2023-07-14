@@ -4,21 +4,39 @@ use svg::node::element::path::{Command, Data, Position};
 use svg::node::element::tag;
 use svg::parser::Event;
 
+/*
+    New version of german states: https://upload.wikimedia.org/wikipedia/commons/2/2c/Karte_Bundesrepublik_Deutschland.svg
+    Areas of Germany listed: https://de.wikipedia.org/wiki/Liste_der_Deutschen_Bundesl%C3%A4nder_nach_Fl%C3%A4che
+    Width and height of German: https://www.lernhelfer.de/schuelerlexikon/geografie/artikel/bundesrepublik-deutschland#
+    Width and height of SVG: Read SVG-Header
+*/
+/// This is the `svg` pixel width.
 const SVG_WIDTH: f64 = 591.504;
+/// This is the `svg` pixel height.
 const SVG_HEIGHT: f64 = 800.504;
+/// This is the horizontal stretch of Germany in km.
 const GERMANY_WIDTH: f64 = 640.0;
+/// This is the vertical stretch of Germany in km.
 const GERMANY_HEIGHT: f64 = 876.0;
+/// This is the horizontal scaler to get from pixel width to real map width.
 const WIDTH_SCALER: f64 = GERMANY_WIDTH / SVG_WIDTH;
+/// This is the vertical scaler to get from pixel width to real map height.
 const HEIGHT_SCALER: f64 = GERMANY_HEIGHT / SVG_HEIGHT;
+/// This is the area scaler to get from pixel area to real map area.
 const AREA_SCALER: f64 = WIDTH_SCALER * HEIGHT_SCALER;
 
 #[derive(Debug)]
 pub struct Polygon2DArea {
+    
+    /// All the borders that define an area.
     borders: Vec<Polygon2D>,
+
+    /// All the holes that also can be inside of the borders.
     holes: Vec<Polygon2D>,
 }
 
 impl Polygon2DArea {
+    /// Returns `true` iff a point `p` is inside the area defined by the borders including holes.
     pub fn contains(&self, p: &Point2D) -> bool {
         for hole in &self.holes {
             if hole.contains_point(p) {
@@ -32,6 +50,7 @@ impl Polygon2DArea {
         }
         return false;
     }
+    /// Returns the area of all borders minus all holes.
     pub fn calculate_area(&self) -> f64 {
         let mut area: f64 = 0.0;
 
@@ -47,18 +66,26 @@ impl Polygon2DArea {
 
 #[derive(Debug, Clone)]
 pub struct City {
+    
+    /// The name of the city.
     name: String,
+    
+    /// The position of a city on a `svg` pixel level.
     pos: Point2D,
 }
 
 #[derive(Debug)]
 pub struct State {
+    /// The name of the state.
     name: String,
+    /// The capital of the state.
     capital: City,
+    /// The area of the state, containing borders and holes.
     area: Polygon2DArea,
 }
 
 impl State {
+    /// Find if a polygon is inside another and if so, consider and add it as a hole.
     fn fill_holes(&mut self, other: Vec<Polygon2D>) {
         for own_border in &self.area.borders {
             for other_border in &other {
@@ -72,14 +99,22 @@ impl State {
 
 #[derive(Debug)]
 pub struct Country {
+    /// The name of the country.
     name: String,
+    /// A vector of all states.
     states: Vec<State>,
+    /// A vector of all state capitals.
     state_capitals: Vec<City>,
-    borders: Vec<Polygon2D>,
-    holes: Vec<Polygon2D>,
+    /// The area of the country, containing borders and holes.
+    area: Polygon2DArea,
 }
 
 impl Country {
+    /// Reads a country from a `svg` file.
+    ///
+    /// This function only fills the vector of all states and all state capitals.
+    /// It does not automatically fills holes or fits state capitals to states.
+    /// This is done with the `fill` method.
     pub fn from_svg(path: &str, country_name: String) -> Country {
         let mut content = String::new();
         let mut group_counter = 0;
@@ -199,11 +234,12 @@ impl Country {
             name: country_name,
             states,
             state_capitals: cities,
-            borders: Vec::new(),
-            holes: Vec::new(),
+            area: Polygon2DArea { borders: Vec::new(), holes: Vec::new() },
         };
     }
 
+    /// Uses the states vector and captial vector to fill in all the blanks within state holes and
+    /// state capitals.
     pub fn fill(&mut self) {
         for i in 0..self.states.len() {
             for j in 0..self.states.len() {
@@ -219,6 +255,7 @@ impl Country {
             }
         }
     }
+    /// Prints a neat representation of the whole country and its state.
     pub fn print(self) {
         println!("Country: {}", self.name);
         for state in self.states {

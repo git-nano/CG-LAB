@@ -13,6 +13,6 @@ fn main() {
 
     println!("Found Intersections: {}", intersections.len());
     
-    save_points(intersections, "test");
+    save_points(intersections, "intersection_points.dat");
 }
 

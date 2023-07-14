@@ -5,7 +5,7 @@ from linesegmentintersections import bentley_ottman
 import sys
 
 segments_path = "../data/s_1000_10.dat"
-intersections_path = "../data/s_1000_10_intersections.dat"
+intersections_path = "intersection_file.dat"
 use_library = True
 
 if len(sys.argv) == 2:

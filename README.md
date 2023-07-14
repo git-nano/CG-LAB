@@ -2,6 +2,9 @@
 
 This repository provides a library for computational geometry and several use cases.
 
+# Easy execution
+Take a look at the `Makefile` for easy handling
+
 # Structure
 
 In `cg_library` is the used library for computational geometry, with its components. Each component is tested.
@@ -31,3 +34,4 @@ And opened with:
 
 There was a little collaboration with team `Bissig/Grasso`. 
 The results were compared and some approaches were discussed.
+

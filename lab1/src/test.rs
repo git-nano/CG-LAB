@@ -18,7 +18,7 @@ fn test_point_addition_str() {
         x: "Hello",
         y: "Its",
     };
-    let p2: Point<&str> = Point {
+    let _p2: Point<&str> = Point {
         x: "World",
         y: "Me",
     };

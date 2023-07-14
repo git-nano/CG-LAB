@@ -20,3 +20,6 @@ build-venv:
 
 clean:
 	git clean -dxff
+
+zip:
+	git archive HEAD -o cg.zip

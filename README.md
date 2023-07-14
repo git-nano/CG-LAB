@@ -15,6 +15,8 @@ Then there are the `labs`:
 For `lab3` python tests were provided. These can be executed using a virtual environment `venv` in the `python_venv` folder. 
 Just follow the instructions after executing `bash setup-venv.sh`.
 
+All data files were inserted into the `data` folder.
+
 # RustDoc
 
 Each `lab` as well as the `cg_library` is documented using RustDoc.

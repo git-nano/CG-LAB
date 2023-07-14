@@ -1,3 +1,8 @@
+# Introduction
+
+This lab uses the `cg_library` to calculate the intersection points with the bently ottmann algorithm.
+The intersections can be saved to a file.
+
 # Process
 
 Execute `bently_ottman`:

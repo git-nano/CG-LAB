@@ -9,6 +9,9 @@ Execute `bently_ottman`:
 
 This uses the library `line-segment-intersections` as comparison.
 
+Use virtual environment:
+`cd ../python_venv/`
+
 Install Environment:
 `bash setup_venv.sh`
 

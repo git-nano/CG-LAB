@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::ops::{Add, Div, Index, Mul, Sub};
+use std::ops::{Add, Index, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Point<T> {
@@ -49,32 +49,6 @@ where
         Self {
             x: self.x - other.x,
             y: self.y - other.y,
-        }
-    }
-}
-
-impl<T> Mul for Point<T>
-where
-    T: Mul<Output = T>,
-{
-    type Output = Self;
-    fn mul(self, other: Self) -> Self::Output {
-        Self {
-            x: self.x * other.x,
-            y: self.y * other.y,
-        }
-    }
-}
-
-impl<T> Div for Point<T>
-where
-    T: Div<Output = T>,
-{
-    type Output = Self;
-    fn div(self, other: Self) -> Self::Output {
-        Self {
-            x: self.x / other.x,
-            y: self.y / other.y,
         }
     }
 }

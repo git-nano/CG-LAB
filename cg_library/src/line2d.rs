@@ -42,7 +42,7 @@ impl Line2D {
 
     /// Returns a new instance from slope and one point on the line.
     pub fn from_slope_and_point(slope: f64, p: Point2D) -> Line2D {
-        let mut intercept = 0.0;
+        let intercept;
         if slope.is_infinite() {
             intercept = p.x;
         } else {
@@ -53,8 +53,8 @@ impl Line2D {
 
     /// Returns a new instance from two points on the line.
     pub fn from_point_and_point(p1: Point2D, p2: Point2D) -> Line2D {
-        let mut slope = 0.0;
-        let mut intercept = 0.0;
+        let slope;
+        let intercept;
         if p1.x == p2.x {
             slope = std::f64::INFINITY;
             intercept = p1.x;

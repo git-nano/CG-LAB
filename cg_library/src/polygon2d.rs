@@ -1,7 +1,33 @@
+//! Polygon in a 2-Dimensional vector space.
+//!
+//! Provides a polygon struct for the computational geometry library [cg_library](crate).
+
 use crate::linesegment2d::LineSegment2D;
 use crate::point2d::Point2D;
 use crate::tools2d::ccw;
 
+/// A polygon in a 2-Dimensional vector space.
+///
+/// This polygon is the basis unit for regions in a 2D space. It builds the fundament for the usage
+/// of all polygons in a 2D space and can be used for the area of a country.
+///
+/// # Example
+///
+/// ```
+/// use cg_library::point2d::Point2D;
+/// use cg_library::polygon2d::Polygon2D;
+///
+/// let points = vec![
+///     Point2D { x: 0.0, y: 0.0 },
+///     Point2D { x: 1.0, y: 1.0 },
+///     Point2D { x: 1.0, y: 2.0 },
+///     Point2D { x: 2.0, y: 2.0 },
+///     Point2D { x: 3.0, y: 3.0 },
+///     Point2D { x: 3.0, y: 0.0 },
+/// ];
+/// let poly: Polygon2D = Polygon2D::new(points);
+///
+/// ```
 #[derive(Debug, Clone)]
 pub struct Polygon2D {
     /// All points of the polygon
@@ -9,12 +35,6 @@ pub struct Polygon2D {
 
     /// All segments of the polygon
     segments: Vec<LineSegment2D>,
-
-    /// Whether the polygon is a simple one
-    simple: bool,
-
-    /// Whether the polygon is a convex one
-    convex: bool,
 
     /// Maximum x value of the bounding box of the Segment
     max_x: f64,
@@ -30,6 +50,14 @@ pub struct Polygon2D {
 }
 
 impl Polygon2D {
+    /// Returns an instance of a polygon initialized with a vector of points.
+    ///
+    /// If the first point of the vector does not fit the last, the first is appended to make a
+    /// closed polygon.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if there are not at least $2$ points.
     pub fn new(mut points: Vec<Point2D>) -> Polygon2D {
         if points.len() <= 2 {
             panic!("A polygon consisting of two points is no polygon!");
@@ -58,8 +86,6 @@ impl Polygon2D {
         return Polygon2D {
             points,
             segments,
-            simple: false,
-            convex: false,
             max_x,
             max_y,
             min_x,
@@ -67,6 +93,7 @@ impl Polygon2D {
         };
     }
 
+    /// Prints out all the points and segments of the polygon.
     pub fn print(&self) {
         println!("Points:");
         for i in &self.points {
@@ -78,7 +105,9 @@ impl Polygon2D {
         }
     }
 
-    /// This actually does not work for points on the polygon
+    /// Returns `true` iff a point `p` is inside a polygon.
+    ///
+    /// This does not work for all points ontop of the polygon.
     pub fn contains(&self, q: &Point2D) -> bool {
         // Get a point outside of the polygon
         let p_outside: Point2D = Point2D {
@@ -91,9 +120,6 @@ impl Polygon2D {
         while 0.0 == ccw(&p_outside, &q, &self.points[i]) {
             i += 1;
         }
-        // println!("point not between p_outside and q: {}",self.points[i]);
-        // println!("p_outside: {}", p_outside);
-        // println!("q: {}", q);
 
         let mut s = 0;
         let mut lr = ccw(&p_outside, q, &self.points[i]).signum();
@@ -108,15 +134,13 @@ impl Polygon2D {
                     <= 0.0
                 {
                     s += 1;
-                    // println!("Adding one: s = {}",s);
-                    // println!("\np[j-1]: {} and p[j]: {} means p~: {} and q: {} lie on opposite sides",&self.points[j-1], &self.points[g], p_outside, q);
                 }
             }
         }
         return s % 2 == 1;
     }
 
-    /// This actually works for all points
+    /// Returns `true` iff a point `p` is inside or ontop of the polygon.
     pub fn contains_point(&self, p: &Point2D) -> bool {
         let mut crossings = 0;
         let n = self.points.len();
@@ -140,6 +164,7 @@ impl Polygon2D {
         crossings % 2 == 1
     }
 
+    /// Returns the area of the polygon, if the polygon is counter clockwise the area is negative.
     pub fn calculate_area(&self) -> f64 {
         let mut area = 0.0;
         for i in 0..(self.points.len() - 1) {
@@ -148,6 +173,7 @@ impl Polygon2D {
         return area * 0.5;
     }
 
+    /// Returns `true` iff all points of another polygon is inside the polygon.
     pub fn contains_polygon(&self, poly: &Polygon2D) -> bool {
         for point in &poly.points {
             if !self.contains_point(point) {

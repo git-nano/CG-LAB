@@ -1,15 +1,27 @@
+//! This is a event point for an event queue.
+//!
+//! Especially usefull for the event queue in the [bently
+//! ottmann](crate::tools2d::bently_ottmann) algorithm where it acts as the x-structure.
+
 use crate::linesegment2d::LineSegment2D;
 use crate::point2d::Point2D;
 use std::cmp::Ordering;
 use std::fmt;
 
+/// An event in the bently ottmann algorithm can have one of three types.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum EventType {
+    /// In case of a point being the left endpoint of a segment.
     IsLeftEndpoint,
+
+    /// In case of a point being the right endpoint of a segment.
     IsRightEndpoint,
+
+    /// In case of a point being the intersection point of two or more segments.
     IsIntersection,
 }
 
+/// This trait allows a EventType to be displayed in text form.
 impl fmt::Display for EventType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -20,34 +32,57 @@ impl fmt::Display for EventType {
     }
 }
 
+/// An event is handled by an event queue. They need to be sorted and they have certain contents.
 #[derive(Clone, Copy)]
 pub struct EventPoint {
+    /// The point associated with the event.
     pub point: Point2D,
+
+    /// This is the type of the event.
     pub event_type: EventType,
+
+    /// This is the segment of the point associated with an event.
     pub first_line: LineSegment2D,
+
+    /// In case of an intersection event is this the second line associated with the event.
+    ///
+    /// In the future this could be replaced by a vector, if one intersection allows more than two
+    /// lines being part of.
     pub second_line: Option<LineSegment2D>,
 }
 
+/// This trait needs to be implemented to satisfy PartialOrd, it is not yet used.
 impl Eq for EventPoint {}
 
+/// This trait is added to allow events to be ordered.
+///
+/// Events are ordered after rising x-coordinates at first and at tie after the y-coordinates of
+/// the associated point.
 impl Ord for EventPoint {
     fn cmp(&self, other: &EventPoint) -> Ordering {
         self.point.partial_cmp(&other.point).unwrap()
     }
 }
 
+/// This trait is added to allow events to be ordered.
+///
+/// Events are ordered after rising x-coordinates at first and at tie after the y-coordinates of
+/// the associated point.
 impl PartialOrd for EventPoint {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.point.cmp(&other.point))
     }
 }
 
+/// This trait allows the comparison of two points, it returns true if two points match.
 impl PartialEq for EventPoint {
     fn eq(&self, other: &Self) -> bool {
         self.point == other.point
     }
 }
 
+/// This trait allows the display of a event in the form of `e: {event_type}, p: {point}, s:
+/// {segment}`
 impl fmt::Display for EventPoint {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
@@ -58,6 +93,8 @@ impl fmt::Display for EventPoint {
     }
 }
 
+/// This trait allows the display in debug mode with all fields in a differnet way, so that for
+/// debugs of large event queues this will conclude in a clear representation of the events.
 impl fmt::Debug for EventPoint {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("EventPoint")

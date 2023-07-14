@@ -27,7 +27,6 @@ const AREA_SCALER: f64 = WIDTH_SCALER * HEIGHT_SCALER;
 
 #[derive(Debug)]
 pub struct Polygon2DArea {
-    
     /// All the borders that define an area.
     borders: Vec<Polygon2D>,
 
@@ -66,10 +65,9 @@ impl Polygon2DArea {
 
 #[derive(Debug, Clone)]
 pub struct City {
-    
     /// The name of the city.
     name: String,
-    
+
     /// The position of a city on a `svg` pixel level.
     pos: Point2D,
 }
@@ -234,7 +232,10 @@ impl Country {
             name: country_name,
             states,
             state_capitals: cities,
-            area: Polygon2DArea { borders: Vec::new(), holes: Vec::new() },
+            area: Polygon2DArea {
+                borders: Vec::new(),
+                holes: Vec::new(),
+            },
         };
     }
 

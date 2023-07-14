@@ -1,3 +1,7 @@
+//! This is the y-structure for the bently ottmann algorithm.
+//!
+//! This the line that sweeps from left to right above all the event points.
+
 use crate::linesegment2d::LineSegment2D;
 use crate::point2d::Point2D;
 use crate::util::eventpoint::{EventPoint, EventType};
@@ -7,16 +11,35 @@ use std::collections::{BTreeMap, BTreeSet};
 use ordered_float::OrderedFloat;
 use std::ops::Bound::{Excluded, Unbounded};
 
+/// This is the heart of the bently ottmann algorithm, it contains all the elements important like
+/// event queue, sweep line and intersection points.
 pub struct SweepLine {
+    /// The event queue of the algorithm, it contains all the event points sorted in a binary
+    /// tree.
+    ///
+    /// From this event queue are points popped from the front ant inserted in the correct order.
+    /// Points are ordered with the event's point coordinate.
     pub event_queue: BTreeSet<EventPoint>,
+
+    /// The y-structure representation of the segments with the `key` being the y-coordinate of the
+    /// associated line that gets updated at every event.
     segments: BTreeMap<OrderedFloat<f64>, LineSegment2D>,
+
+    /// The current event that is handled at the moment.
     current_event: Option<EventPoint>,
+
+    /// That is the current x-coordinate that the sweepline is at.
     current_x: f64,
+
+    /// This is the current y-coordinate of the event's current y-coordinate.
     events_order: OrderedFloat<f64>,
+
+    /// This is the vector of all intersecting points.
     pub intersection_points: Vec<Point2D>,
 }
 
 impl SweepLine {
+    /// Returns a zero initialized `SweepLine` instance.
     pub fn new() -> SweepLine {
         return SweepLine {
             event_queue: BTreeSet::new(),
@@ -27,6 +50,15 @@ impl SweepLine {
             intersection_points: Vec::new(),
         };
     }
+    /// This pops a new event point from the event queue and handles it.
+    ///
+    /// 1. Pops event form queue.
+    /// 2. Update segments in the y-structure with event's x-coordinate.
+    /// 3. Handle event type:
+    ///     - LeftEndpoint
+    ///     - RightEndpoint
+    ///     - Intersection
+    ///
     pub fn process_next_event(&mut self) {
         let e: EventPoint = self.event_queue.pop_first().unwrap();
 
@@ -42,6 +74,7 @@ impl SweepLine {
                 let seg_a = self.get_next_neighbor(self.events_order);
                 let seg_b = self.get_prev_neighbor(self.events_order);
 
+                // If the segment above exists and intersects the events segment
                 if let Some(seg_a) = seg_a {
                     if let Some(intersection) = seg_a.intersects(&seg_e) {
                         if intersection.x > self.current_x {
@@ -55,6 +88,7 @@ impl SweepLine {
                     }
                 }
 
+                // If the segment below exists and intersects the events segment
                 if let Some(seg_b) = seg_b {
                     if let Some(intersection) = seg_b.intersects(&seg_e) {
                         if intersection.x > self.current_x {
@@ -73,6 +107,7 @@ impl SweepLine {
                 let seg_b = self.get_prev_neighbor(self.events_order);
                 self.segments.remove(&self.events_order);
 
+                // If the segment above and below both exist and intersects
                 if let (Some(seg_a), Some(seg_b)) = (seg_a, seg_b) {
                     if let Some(intersection) = seg_a.intersects(&seg_b) {
                         if intersection.x > self.current_x {
@@ -99,6 +134,7 @@ impl SweepLine {
                 let seg_a = self.get_prev_neighbor(order_e2);
                 let seg_b = self.get_next_neighbor(order_e1);
 
+                // If the upper segment now has a next neighbor and intersects it
                 if let Some(seg_a) = seg_a {
                     if let Some(intersection) = seg_a.intersects(&seg_e2) {
                         if intersection.x > self.current_x {
@@ -112,6 +148,7 @@ impl SweepLine {
                     }
                 }
 
+                // If the lower segment now has a previous neighbor and intersects it
                 if let Some(seg_b) = seg_b {
                     if let Some(intersection) = seg_b.intersects(&seg_e1) {
                         if intersection.x > self.current_x {
@@ -128,6 +165,12 @@ impl SweepLine {
         }
     }
 
+    /// This rearranges all line segments in the `segments` map.
+    ///
+    /// The rearranging works by calculating every y-coordinate of each line segment with the
+    /// current x-coordinate of the sweep line. In the case of an intersection, where two lines
+    /// would have the same y-coordinate, a small epsilon value is added to retrieve the position
+    /// after the intersection x-coordinate.
     pub fn update_segments(&mut self) {
         let epsilon = if self.current_event.unwrap().event_type != EventType::IsIntersection {
             0.0
@@ -145,6 +188,7 @@ impl SweepLine {
         std::mem::swap(&mut self.segments, &mut temp_map);
     }
 
+    /// This enables a print of the current state of the sweep line segments.
     pub fn print(&self) {
         println!("\nCurrent x: {}", self.current_x);
         println!("Current event: {}", self.current_event.unwrap());
@@ -154,6 +198,7 @@ impl SweepLine {
         }
     }
 
+    /// Returns the next segment neighbor of a given key value in the y-structure.
     pub fn get_next_neighbor(&self, key: OrderedFloat<f64>) -> Option<LineSegment2D> {
         let next = self.segments.range((Excluded(&key), Unbounded)).next();
         if let Some((_next_key, next_value)) = next {
@@ -162,6 +207,8 @@ impl SweepLine {
             return None;
         }
     }
+
+    /// Returns the previous segment neighbor of a given key value in the y-structure.
     pub fn get_prev_neighbor(&self, key: OrderedFloat<f64>) -> Option<LineSegment2D> {
         let prev = self.segments.range((Unbounded, Excluded(&key))).next_back();
         if let Some((_prev_key, prev_value)) = prev {
@@ -171,7 +218,6 @@ impl SweepLine {
         }
     }
 }
-
 
 #[cfg(test)]
 mod test_sweep_line {

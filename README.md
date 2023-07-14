@@ -23,3 +23,9 @@ It can be created by using:
 
 And opened with:
 `firefox target/doc/cg_library/index.html`
+
+
+# Collaboration
+
+There was a little collaboration with team `Bissig/Grasso`. 
+The results were compared and some approaches were discussed.
